@@ -1,0 +1,56 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block styles %}
+{{ super() }}
+    <style>
+        body {background #e8f1f9; }
+    </style>
+{% endblock %}
+
+{% block title %}
+tryurbit
+{% endblock %}
+
+{% block content %}
+    <div class="headline offset-md-1">
+        <h4> tryurbit </h4>
+        <hr>
+        <div class="page-header">
+        
+            <p>Welcome to tryurbit. This site creates an anonymous ID (called a comet in Urbit lexicon), then boots you into the Urbit network with it.</p>
+            <p></p>
+            <p>Experience the Landscape interface and make new friends.</p>
+            
+        </div>
+    </div>
+    
+    <span>
+    <hr>
+    
+    <div> 
+    
+        <form action="" method="post" class="form" role="form">
+            {{ form.csrf_token() }}
+            <div class="row">
+                <div class="form-group col-md-4 offset-md-1">
+                    {{ wtf.form_field(form.name, class='form-control', placeholder='name') }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-md-4 offset-md-1">
+                    {{ wtf.form_field(form.email, class='form-control', placeholder='email') }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-md-4 offset-md-1">
+                    {{ wtf.form_field(form.optin, class='form-control', placeholder='optin') }}
+                </div>
+            </div>   
+            <div class="row">
+                <button type="submit" class="btn btn-primary offset-md-1">Gimme Comet!</button>
+            </div>
+        </form>
+    </div>
+    
+{% endblock %}

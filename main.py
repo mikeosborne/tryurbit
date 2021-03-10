@@ -26,7 +26,7 @@ from model import *
 
 #  Set up logging  
 LOGFILE = 'main.log'
-logging.basicConfig(filename=LOG_DIR+LOGFILE, datefmt='%Y-%m-%d %H:%M:%S', level=logging.DEBUG, format='%(asctime)s %(levelname)s: %(message)s')
+logging.basicConfig(filename=LOG_DIR+LOGFILE, datefmt='%Y-%m-%d %H:%M:%S', level=logging.DEBUG, format='%(asctime)s %(levelname)s: %(message)s', filemode='w')
 
 
 #  Set up database    
@@ -35,24 +35,6 @@ Base.metadata.create_all(bind=engine)
 
 # Get app globals
 appglobals = db.query(AppGlobals).first()
-
-'''
-# Set up port lists
-ports_available = [
-    '8080',
-    '8081',
-    '8082',
-    '8083',
-    '8084',
-    '8085',
-    '8086',
-    '8087',
-    '8088',
-    '8089',
-    '8090'
-]
-ports_used = []
-'''
 procs_active = []
 
 # Comet process class
@@ -61,7 +43,7 @@ class Comet_Process():
     pid = None
     
     def __init__(self, port, pier):
-        self.proc = subprocess.Popen(['nohup', URBIT_EXE, 'run', '-d', '--http-port', port, pier], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        self.proc = ss
         self.pid = self.proc.pid
         
     def __repr__(self):
@@ -115,7 +97,7 @@ def mine():
         act_mined_comets += 1
         curcometid += 1 
         
-        logging.info('{} mined code: {} pier: {}'.format(comet_name, code, pier))
+        logging.info(' MINED    {}  code: {} pier: {}'.format(comet_name, code, pier))
         
     return
 
@@ -158,16 +140,17 @@ def ready():
         port.available = False 
                
         # boot up the comet    
-        proc = Comet_Process(port.port, pier)
-        procs_active.append(proc)
+        #proc = Comet_Process(port.port, pier)
+        procs_active.insert(0,subprocess.Popen(['nohup', URBIT_EXE, 'run', '-d', '--port-forwarding', '--http-port', str(port.port), pier], 
+                                               stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL))
         
         # update the record
         cur_comet.port = port.port
-        cur_comet.pid = proc.pid
+        cur_comet.pid = procs_active[0].pid
         cur_comet.status = CometStatus.READY
         cur_comet.ready_ts = datetime.now()
         db.commit()
-        logging.info('{} now ready on port: {} pid: {}'.format(cur_comet.name, cur_comet.port, cur_comet.pid))
+        logging.info(' READY    {}  port: {} pid: {}'.format(cur_comet.name, cur_comet.port, cur_comet.pid))
         
         # increment counter
         act_ready_comets += 1
@@ -183,6 +166,7 @@ def ready():
 ############################################################################################
            
 def drop():
+    
     #  get assigned comets
     assigned_comets = db.query(Comet).filter(Comet.status == CometStatus.ASSIGNED).all()
     
@@ -191,12 +175,11 @@ def drop():
             # kill proc
             for proc in procs_active:
                 if proc.pid == comet.pid:
+                    procs_active.remove(proc)
                     try:
-                        proc.proc.terminate()
+                        proc.terminate()
                     except:
                         logging.error('error trying to terminate pid {}'.format(comet.pid))
-                        break
-                    procs_active.remove(proc)
                     break
                          
             # delete pier
@@ -212,7 +195,7 @@ def drop():
                 dbport.available = True
             
             db.commit()
-            
+            logging.info(' DROPPED  {}'.format(comet.name))           
     
     return
     

@@ -35,7 +35,7 @@ class Comet(Base):
     assigned    = Column(Integer)
     pier        = Column(String(64))
     pid         = Column(Integer)
-    port        = Column(String(64))
+    port        = Column(Integer)
     mined_ts    = Column(DateTime)
     ready_ts    = Column(DateTime)
     assigned_ts = Column(DateTime)
@@ -64,13 +64,13 @@ class Users(Base):
     id    = Column(Integer, primary_key=True, autoincrement=True, index=True)
     name  = Column(String(64))
     email = Column(String(64))
-    group = Column(String(64))
+    init_group = Column(String(64))
     optin = Column(Boolean)
     
-    def __init__(self, name, email, init_group=None, optin=False):
+    def __init__(self, name, email, optin=False, init_group=None):
         self.name = name
         self.email = email
-        self.init_group = group
+        self.init_group = init_group
         self.optin = optin
         
     def __repr__(self):
