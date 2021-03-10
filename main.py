@@ -37,19 +37,7 @@ Base.metadata.create_all(bind=engine)
 appglobals = db.query(AppGlobals).first()
 procs_active = []
 
-# Comet process class
-class Comet_Process():
-    proc = None
-    pid = None
-    
-    def __init__(self, port, pier):
-        self.proc = ss
-        self.pid = self.proc.pid
-        
-    def __repr__(self):
-        return('<PID {}>'.format(self.pid))
-        
-    
+  
     
 ############################################################################################
 ###                                                                                      ###
@@ -140,7 +128,6 @@ def ready():
         port.available = False 
                
         # boot up the comet    
-        #proc = Comet_Process(port.port, pier)
         procs_active.insert(0,subprocess.Popen(['nohup', URBIT_EXE, 'run', '-d', '--port-forwarding', '--http-port', str(port.port), pier], 
                                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL))
         
